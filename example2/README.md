@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Intro](#intro)
-- [File Structure](#file%20structure)
+- [File Structure](#file-structure)
 - [Setup](#setup)
 
 ## Intro
