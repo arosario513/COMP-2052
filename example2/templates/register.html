@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    <h1>{{title}}</h1>
+    {% if error %}
+    <div class="container rounded fw-bold bg-danger mb-3 text-center">
+        <h5 class="p-3">{{error}}</h5>
+    </div>
+    {% endif %}
+    <form method="POST" action="/register">
+        <input class="form-control mb-2" type="text" name="username" placeholder="Username" minlength=3 required>
+        <input class="form-control mb-2" type="password" name="password" placeholder="Password" minlength=8 required>
+        <input class="form-control mb-2" type="password" name="verify_password" placeholder="Verify Password" minlength=8 required>
+        <button class="btn btn-primary w-100" type="submit">Create Account</button>
+    </form>
+</div>
+{% endblock %}
