@@ -23,13 +23,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
 lm: LoginManager = LoginManager()
 ph: PasswordHasher = PasswordHasher()
 
+DUMMY_HASH = "$argon2id$v=19$m=65536,t=3,p=4$cn6382O+GKdFP5HGFUqwCA$MazNjdUS2EOk96rL1tHseuf+GGS6mwOclCWozUgi3Aw"
+
 db.init_app(app)
 lm.init_app(app)
 
 
 @lm.user_loader
 def load_user(uid: int):
-    return User.query.get(uid)
+    return db.session.get(User, uid)
 
 
 @app.route("/")
@@ -44,20 +46,31 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         verify_password = request.form.get("verify_password")
-        if username and password:
-            if User.query.filter_by(username=username).first():
-                error = "User already exists"
-            elif password != verify_password:
-                error = "Passwords must match"
-            else:
-                hash = ph.hash(password)
-                user = User(username=username, password=hash)
 
-                db.session.add(user)
-                db.session.commit()
+        if not username or not password or not verify_password:
+            error = "Fill out all fields"
 
-                login_user(user)
-                return redirect(url_for("dashboard"))
+        if db.session.execute(
+            db.select(User)
+            .filter_by(username=username)
+        ).first():
+            error = "User already exists"
+
+        elif password != verify_password:
+            assert password is not None
+            error = "Passwords must match"
+
+        else:
+            assert password is not None
+            hash = ph.hash(password)
+            user = User(username=username, password=hash)
+
+            db.session.add(user)
+            db.session.commit()
+
+            login_user(user)
+
+            return redirect(url_for("dashboard"))
     return render_template("register.html", title="Register", error=error)
 
 
@@ -68,16 +81,32 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        try:
-            if username and password:
-                user = User.query.filter_by(username=username).first()
-                if user and ph.verify(user.password, password):
-                    login_user(user)
-                    return redirect(url_for("dashboard"))
-                else:
-                    error = "Invalid Login"
-        except VerifyMismatchError:
-            error = "Wrong Password"
+        if not username or not password:
+            error = "Fill out all fields"
+
+        else:
+            user = User.query.filter_by(username=username).first()
+
+            assert password is not None
+
+            # This is to avoid timing attacks. I know, it's overkill.
+            user_hash = user.password if user else DUMMY_HASH
+
+            try:
+                is_valid_password = ph.verify(user_hash, password)
+            except VerifyMismatchError:
+                is_valid_password = False
+
+            if is_valid_password and user:
+                login_user(user)
+                return redirect(url_for("dashboard"))
+
+            elif user:
+                error = "Wrong Password"
+
+            else:
+                error = "Invalid Login"
+
     return render_template("login.html", title="Login", error=error)
 
 
