@@ -44,6 +44,11 @@ Then go to `example2`:
 ```bash
 cd example2
 ```
+Create an .env file with the `SECRET_KEY`
+I'll use this python one-liner to create the key and save it to `.env`. This is necessary otherwise `main.py` will complain about not setting `SECRET_KEY`:
+```bash
+python -c 'import secrets; SECRET_KEY=secrets.token_urlsafe(32);print(f"{SECRET_KEY=}")' > .env
+```
 
 Setup the python virtual environment:
 
