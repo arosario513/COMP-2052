@@ -7,28 +7,36 @@
 - [Setup](#setup)
 
 ## Intro
+
 This example is to show how a login with flask would work. It uses flask-SQLAlchemy for the database.
 
 ## File Structure
+
 ```
 example2
+├── auth
+│   └── __init__.py
 ├── instance
 │   └── db.sqlite
 ├── main.py
 ├── models
 │   ├── __init__.py
 │   └── user.py
+├── README.md
 ├── requirements.txt
 └── templates
     ├── base.html
     ├── dashboard.html
+    ├── error.html
     ├── footer.html
     ├── header.html
     ├── index.html
     ├── login.html
     └── register.html
 ```
+
 ## Setup
+
 ```bash
 mkdir example
 cd example
@@ -39,17 +47,23 @@ git sparse-checkout init
 git sparse-checkout add example2
 git pull origin main
 ```
+
 Then go to `example2`:
 
 ```bash
 cd example2
 ```
+
 ### Create an .env file with the `SECRET_KEY`
+
 I'll use this python one-liner to create the key and save it to `.env`. This is necessary otherwise `main.py` will complain about not setting `SECRET_KEY`:
+
 ```bash
 python -c 'import secrets; SECRET_KEY=secrets.token_urlsafe(32);print(f"{SECRET_KEY=}")' > .env
 ```
+
 `.env` should look something like this:
+
 ```bash
 # This is an example key, it's not used for anything.
 SECRET_KEY='3ULfF3kSU-0IWGxCbenEdFlBsIITIqYH0iHDtse3KW0'
