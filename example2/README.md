@@ -14,25 +14,30 @@ This example is to show how a login with flask would work. It uses flask-SQLAlch
 
 ```
 example2
-├── auth
-│   └── __init__.py
+├── app
+│   ├── auth
+│   │   ├── forms.py
+│   │   ├── __init__.py
+│   │   └── routes.py
+│   ├── __init__.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── user.py
+│   ├── routes.py
+│   └── templates
+│       ├── base.html
+│       ├── dashboard.html
+│       ├── error.html
+│       ├── footer.html
+│       ├── header.html
+│       ├── index.html
+│       ├── login.html
+│       └── register.html
 ├── instance
 │   └── db.sqlite
 ├── main.py
-├── models
-│   ├── __init__.py
-│   └── user.py
 ├── README.md
-├── requirements.txt
-└── templates
-    ├── base.html
-    ├── dashboard.html
-    ├── error.html
-    ├── footer.html
-    ├── header.html
-    ├── index.html
-    ├── login.html
-    └── register.html
+└── requirements.txt
 ```
 
 ## Setup
