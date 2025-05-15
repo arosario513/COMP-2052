@@ -1,4 +1,4 @@
-# **MASS**: *Medical Appointment Scheduling System*
+# **MASS**: _Medical Appointment Scheduling System_
 
 > A full-stack medical scheduling web application built with [Flask](https://flask.palletsprojects.com/en/stable/), containerized with [Docker](https://www.docker.com/), and served via [Gunicorn](https://gunicorn.org/) and [Nginx](https://nginx.org/en/).
 
@@ -22,7 +22,7 @@ Before starting, clone the repository and run the setup script:
 
 ```bash
 curl https://raw.githubusercontent.com/arosario513/COMP-2052/refs/heads/main/work/final/setup.sh | sh
-````
+```
 
 **OR**
 
@@ -47,16 +47,16 @@ pip install -r requirements.txt
 ```
 final/
 ├── app/
-│   ├── admin/          # Admin-specific routes and forms
-│   ├── appointments/   # Appointment logic
-│   ├── auth/           # Authentication and registration
-│   ├── models/         # SQLAlchemy models
-│   ├── static/         # CSS, JS, icons
-│   └── templates/      # HTML templates
+│   ├── admin/
+│   ├── appointments/
+│   ├── auth/
+│   ├── models/
+│   ├── static/
+│   └── templates/
 ├── docker-compose.yml
 ├── Dockerfile
-├── gen-certs.sh        # SSL generation script
-├── main.py             # App entry point
+├── gen-certs.sh
+├── main.py
 ├── nginx/default.conf
 ├── requirements.txt
 └── setup.sh
@@ -124,7 +124,7 @@ docker-compose up -d --build
 
 Then visit:
 
-* [https://127.0.0.1](https://127.0.0.1)
-* [https://mass.localhost](https://mass.localhost)
+- [https://127.0.0.1](https://127.0.0.1)
+- [https://mass.localhost](https://mass.localhost)
 
 **Note**: Browsers will warn you about the self-signed certs. For production, replace them with real certificates and update `nginx/default.conf` accordingly.
