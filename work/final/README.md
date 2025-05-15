@@ -1,20 +1,30 @@
-# MASS: Medical Appointment Scheduling System
+# **MASS**: *Medical Appointment Scheduling System*
 
-## Intro
+> A full-stack medical scheduling web application built with [Flask](https://flask.palletsprojects.com/en/stable/), containerized with [Docker](https://www.docker.com/), and served via [Gunicorn](https://gunicorn.org/) and [Nginx](https://nginx.org/en/).
 
-This app was made in python using [flask](https://flask.palletsprojects.com/en/stable/) and deployed using [Docker](https://www.docker.com/), [gunicorn](https://gunicorn.org/) and [nginx](https://nginx.org/en/). This is my last work of COMP-2052, probably my biggest project so far.
+## Table of Contents
+
+- [About the Project](#about-the-project)
+- [Manual Setup](#manual-setup)
+- [Docker Setup](#docker-setup)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+
+## About the Project
+
+MASS is my final project for **COMP-2052** and the most ambitious app I've developed so far. It enables users to register, log in, and schedule appointments, with roles for Admins, Doctors, and Patients.
 
 ## Manual Setup
 
-Before deploying the app, we must clone it first, and then set up some variables.
+Before starting, clone the repository and run the setup script:
 
 ### macOS/Linux
 
 ```bash
 curl https://raw.githubusercontent.com/arosario513/COMP-2052/refs/heads/main/work/final/setup.sh | sh
-```
+````
 
-or
+**OR**
 
 ```bash
 wget https://raw.githubusercontent.com/arosario513/COMP-2052/refs/heads/main/work/final/setup.sh
@@ -22,169 +32,99 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-This will have the `final` app in wherever you ran the setup script
+Navigate into the `final/` directory and set up your Python environment:
 
-### Structure
+```bash
+cd final
+python -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Project Structure
 
 ```
-final
-├── app
-│   ├── admin
-│   │   ├── forms.py
-│   │   ├── __init__.py
-│   │   └── routes.py
-│   ├── appointments
-│   │   ├── forms.py
-│   │   ├── __init__.py
-│   │   └── routes.py
-│   ├── auth
-│   │   ├── forms.py
-│   │   ├── __init__.py
-│   │   └── routes.py
-│   ├── __init__.py
-│   ├── models
-│   │   ├── appointment.py
-│   │   ├── __init__.py
-│   │   ├── role.py
-│   │   └── user.py
-│   ├── routes.py
-│   ├── security.py
-│   ├── static
-│   │   ├── bootstrap-icons-1.12.1
-│   │   │   ├── bootstrap-icons.min.css
-│   │   │   └── fonts
-│   │   │       ├── bootstrap-icons.woff
-│   │   │       └── bootstrap-icons.woff2
-│   │   ├── css
-│   │   │   ├── bootstrap.min.css
-│   │   │   └── style.css
-│   │   ├── favicon.ico
-│   │   └── js
-│   │       └── bootstrap.bundle.min.js
-│   └── templates
-│       ├── accounts.html
-│       ├── appointments.html
-│       ├── base.html
-│       ├── edit.html
-│       ├── error.html
-│       ├── footer.html
-│       ├── header.html
-│       ├── index.html
-│       ├── login.html
-│       ├── modal_appt.html
-│       ├── modal.html
-│       ├── new_account.html
-│       ├── new_appointment.html
-│       └── register.html
+final/
+├── app/
+│   ├── admin/          # Admin-specific routes and forms
+│   ├── appointments/   # Appointment logic
+│   ├── auth/           # Authentication and registration
+│   ├── models/         # SQLAlchemy models
+│   ├── static/         # CSS, JS, icons
+│   └── templates/      # HTML templates
 ├── docker-compose.yml
 ├── Dockerfile
-├── gen-certs.sh
-├── main.py
-├── nginx
-│   └── default.conf
+├── gen-certs.sh        # SSL generation script
+├── main.py             # App entry point
+├── nginx/default.conf
 ├── requirements.txt
 └── setup.sh
 ```
 
-Then proceed to cd into `final`.
+## Environment Variables
 
-Now we have to setup the python environment, which can be done with:
+Create a `.env` file in the project root with the following:
 
-```bash
-python -m venv venv
-```
+```env
+SECRET_KEY='your_secret_key_here'
 
-Enter the virtual environment:
-
-```
-source venv/bin/activate
-```
-
-You should have `(venv)` somewhere on the terminal letting you know you're in the virtual environment
-
-Make sure pip is up-to-date:
-
-```bash
-pip install --upgrade pip
-```
-
-Now install the requirements:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Environment Variables
-
-This is needed otherwise flask will yell at you.
-
-Create a file named `.env` and fill the credentials:
-
-```bash
-SECRET_KEY='yoursecretkey'
-
-# Default Values (don't use these)
+# Default Admin Credentials (change these!)
 ADMIN_FIRSTNAME='Default'
 ADMIN_LASTNAME='Admin'
 ADMIN_EMAIL='admin@example.com'
 ADMIN_PASSWORD='changeme123'
 ```
 
-To set a proper secret key you can use this one-liner:
+To generate a secure `SECRET_KEY`:
 
 ```bash
-python -c 'import secrets;k=secrets.token_hex(16);print(k)'
+python -c 'import secrets; print(secrets.token_hex(16))'
 ```
 
-Example Output:
+## Running the App (Manually)
 
-```bash
-b1d1e66e4266f3e9e2c63939fdd75292
-```
+Once configured:
 
-And then set it for `SECRET_KEY`
-
-```bash
-SECRET_KEY='b1d1e66e4266f3e9e2c63939fdd75292'
-```
-Now you can run the app with:
 ```bash
 gunicorn -w 4 -b 0.0.0.0:5000 main:app
 ```
 
-You can change the port to whatever you want, just make sure it doesn't conflict with anything else.
+You may change the port if needed.
 
-## Setup with Docker
-**Note:** Make sure you got Docker and OpenSSL installed.
+## Docker Setup
 
-I prefer this method, because it's more secure and because I'm lazy.
+> **Preferred method** – easier, isolated, and more secure.
 
-First clone the repo, and set the variables in `.env` like in the manual setup.
+Ensure you have Docker and OpenSSL installed.
 
-Then, run the `gen-certs.sh` script:
+1. Clone the repo and create your `.env` file.
+2. Generate self-signed SSL certs:
+
 ```bash
 ./gen-certs.sh
 ```
-### Output:
+
+Example output:
+
 ```
 [+] Generating root CA...
 [+] Issuing cert for mass-server...
 Certificate request self-signature ok
 subject=C=US, ST=PR, O=MASS, OU=MASS, CN=mass-server
 ```
-This will create the SSL certificates needed for HTTPS
 
-Make sure it created them correctly inside `nginx/certs`:
-```
-mass-server.key  mass-server.pem  rootCA.key  rootCA.pem  rootCA.srl
-```
-Now, you can run:
+3. Verify certificates were created in `nginx/certs/`.
+
+4. Build and run the app:
+
 ```bash
 docker-compose up -d --build
 ```
-It will download and build everything needed the first time you run it, but then it will start everything up.
-You can check `https://127.0.0.1` or `https://mass.localhost` to see if it works.
 
-You can also change the SSL certs (which is very recommended for production) for other ones from a domain you own, since these ones are self-signed you'll most likely get a warning about them not being secure, just make sure to change `nginx/default.conf` to match the domains and remove the old certs for the new ones.
+Then visit:
 
-To-do: Add previews of the page
+* [https://127.0.0.1](https://127.0.0.1)
+* [https://mass.localhost](https://mass.localhost)
+
+**Note**: Browsers will warn you about the self-signed certs. For production, replace them with real certificates and update `nginx/default.conf` accordingly.
