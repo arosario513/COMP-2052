@@ -37,7 +37,7 @@ class Database(SQLAlchemy):
             logging.warning(
                 "[!] Admin values have default values. \
                 Please set all of them in the .env file.",
-                RuntimeError
+                RuntimeWarning
             )
 
         admin = User.query.filter_by(email=email).first()
