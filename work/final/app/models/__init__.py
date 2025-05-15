@@ -35,7 +35,7 @@ class Database(SQLAlchemy):
                 or password == "changeme123":
 
             logging.warning(
-                "[!] Admin values have default values. Please set all of them in the .env file."
+                "[!] Admin credentials have default values. Please set all of them in the .env file."
             )
 
         admin = User.query.filter_by(email=email).first()
