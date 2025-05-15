@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from argon2 import PasswordHasher
 from dotenv import load_dotenv
 from os import getenv
+import logging
 
 load_dotenv()
 
@@ -23,28 +24,23 @@ class Database(SQLAlchemy):
 
     def add_admin(self):
         from app.models.user import User
-        first_name: str | None = getenv("ADMIN_FIRSTNAME")
-        last_name: str | None = getenv("ADMIN_LASTNAME")
-        email: str | None = getenv("ADMIN_EMAIL")
-        password: str | None = getenv("ADMIN_PASSWORD")
-        if not first_name:
-            raise ValueError(
-                "ADMIN_FIRSTNAME must be set in the environment."
-            )
-        if not last_name:
-            raise ValueError(
-                "ADMIN_LASTNAME must be set in the environment."
-            )
-        if not email:
-            raise ValueError(
-                "ADMIN_EMAIL must be set in the environment."
-            )
-        if not password:
-            raise ValueError(
-                "ADMIN_PASSWORD must be set in the environment."
-            )
-        admin = User.query.filter_by(email=email).first()
+        first_name: str = getenv("ADMIN_FIRSTNAME") or "Default"
+        last_name: str = getenv("ADMIN_LASTNAME") or "Admin"
+        email: str = getenv("ADMIN_EMAIL") or "admin@example.com"
+        password: str = getenv("ADMIN_PASSWORD") or "changeme123"
 
+        if first_name == "Default" \
+                or last_name == "Admin" \
+                or email == "admin@example.com" \
+                or password == "changeme123":
+
+            logging.warning(
+                "[!] Admin values have default values. \
+                Please set all of them in the .env file.",
+                RuntimeError
+            )
+
+        admin = User.query.filter_by(email=email).first()
         if not admin:
             hash = ph.hash(password)
             admin = User(first_name, last_name, email, hash)
