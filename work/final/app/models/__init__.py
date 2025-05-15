@@ -35,8 +35,7 @@ class Database(SQLAlchemy):
                 or password == "changeme123":
 
             logging.warning(
-                "[!] Admin values have default values. \
-                Please set all of them in the .env file.",
+                "[!] Admin values have default values. Please set all of them in the .env file.",
                 RuntimeWarning
             )
 
