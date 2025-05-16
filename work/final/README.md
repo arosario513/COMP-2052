@@ -88,6 +88,15 @@ ADMIN_FIRSTNAME='Default'
 ADMIN_LASTNAME='Admin'
 ADMIN_EMAIL='admin@example.com'
 ADMIN_PASSWORD='changeme123'
+
+# Email settings — required for password reset functionality
+# Use valid SMTP credentials (e.g., Gmail with App Passwords)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password   # Use a Gmail App Password
+MAIL_DEFAULT_SENDER=your_email@gmail.com
 ```
 
 To generate a secure `SECRET_KEY`:
