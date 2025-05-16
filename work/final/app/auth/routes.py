@@ -1,14 +1,15 @@
 #!venv/bin/python
 
-from app.auth.forms import Register, Login
-from app.models.user import User
+from flask_mail import Message
+from . import auth_blueprint
+from app.auth.forms import ForgotPassword, Register, Login, Reset
 from app.models import db
+from app.models.user import User
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from flask import current_app, url_for, redirect, render_template, flash
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_principal import Identity, identity_changed, AnonymousIdentity
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from . import auth_blueprint
 
 ph = PasswordHasher()
 
@@ -93,3 +94,50 @@ def logout():
         auth_blueprint, identity=AnonymousIdentity
     )
     return redirect(url_for("auth.login"))
+
+
+@auth_blueprint.route("/forgot-password", methods=["GET", "POST"])
+def forgot():
+    form = ForgotPassword()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = User.query.filter_by(email=email).first()
+        assert user is not None
+        token: str = user.get_reset_token()
+        url = url_for(
+            "auth.reset",
+            token=token,
+            _external=True
+        )
+        msg = Message("Password Reset", recipients=[user.email])
+        msg.body = f"""
+        Hello {user.fullname()},
+
+        To reset your password, click the following link:
+        {url}
+
+        If you didn't request for a password reset, ignore this message.
+        """
+        from app import mail
+        mail.send(msg)
+        flash("Request for password reset sent", "success")
+        return redirect(url_for("auth.login"))
+    return render_template("forgot.html", title="Forgot Password", form=form)
+
+
+@auth_blueprint.route("/reset/<token>", methods=["GET", "POST"])
+def reset(token: str):
+    user = User.verify_reset_token(token)
+    if not user:
+        flash("Invalid token", "danger")
+        return redirect(url_for("auth.login"))
+    form = Reset()
+    if form.validate_on_submit():
+        password = form.password.data
+        assert password is not None
+        hash = ph.hash(password)
+        user.password = hash
+        db.session.commit()
+        flash("Password changed", "success")
+        return redirect(url_for("auth.login"))
+    return render_template("reset.html", title="Reset Password", form=form)

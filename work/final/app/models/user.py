@@ -1,4 +1,6 @@
+from flask import current_app
 from flask_login import UserMixin
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy.orm import relationship
 from . import db
 from .role import Role, user_roles
@@ -17,6 +19,26 @@ class User(UserMixin, db.Model):
         self.last_name = last_name
         self.email = email
         self.password = password
+
+    def get_reset_token(self):
+        serial: URLSafeTimedSerializer = URLSafeTimedSerializer(
+            current_app.config["SECRET_KEY"]
+        )
+        return serial.dumps(self.email)
+
+    @staticmethod
+    def verify_reset_token(token, max_age=600):
+        serial: URLSafeTimedSerializer = URLSafeTimedSerializer(
+            current_app.config["SECRET_KEY"]
+        )
+        try:
+            email = serial.loads(
+                token,
+                max_age=max_age
+            )
+        except SignatureExpired or BadSignature:
+            return None
+        return User.query.filter_by(email=email).first()
 
     def get_roles(self):
         return [r.name for r in self.roles]
